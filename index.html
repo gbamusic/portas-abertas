@@ -308,18 +308,17 @@ var CONFIG = {
   teaserVideo: 'videos/trechinho.mp4',                 // selo 3: trechinho em primeira mão (arquivo na pasta videos/)
   premiereUrl: 'https://SEU-LINK-DA-ESTREIA-NO-YOUTUBE', // selo 4: estreia agendada (ativar o sininho)
   siteUrl: 'https://gbamusic.github.io/portas-abertas/',
-  artistClue: 'Ramon e Rafael',                         // quem esconde a pista do selo 4
   launchDate: '2026-11-17'
 };
-/* Respostas embaralhadas (texto invertido em base64). Selo 4: troque pela resposta real. */
+/* Respostas embaralhadas (texto invertido em base64).  */
 var DAYS = [
   { d: '2026-11-13', label: '13/11', q: 'Em que cidade Jesus nasceu?', k: 'TUVMRUI=', hint: 'Fica na Judeia e começa com B.', reveal: 'familia', next: 'o nome da música que vamos cantar juntos.' },
   { d: '2026-11-14', label: '14/11', q: 'Qual nome de Jesus significa “Deus conosco”?', k: 'TEVVTkFNRQ==', hint: 'Está em Mateus 1,23. Começa com E.', reveal: 'capa', next: 'um aperitivo antes da ceia.' },
-  { d: '2026-11-15', label: '15/11', q: 'O que guiou os Magos até o Menino?', k: 'QUxFUlRTRQ==', hint: 'Brilhou no céu do Oriente e guiou três reis.', reveal: 'trecho', next: 'o último selo. A pista está com os artistas.' },
+  { d: '2026-11-15', label: '15/11', q: 'O que guiou os Magos até o Menino?', k: 'QUxFUlRTRQ==', hint: 'Brilhou no céu do Oriente e guiou três reis.', reveal: 'trecho', next: 'o último selo.' },
   { d: '2026-11-16', label: '16/11', q: null, k: 'QUlSQU0=', hint: null, reveal: 'obrigado', next: '' }
 ];
-DAYS[3].q = 'Nos Stories de ' + CONFIG.artistClue + ' tem um envelope escrito à mão. Para quem é?';
-DAYS[3].hint = 'Abra o perfil de ' + CONFIG.artistClue + ' e veja os Stories de hoje. O nome está depois de “Para:”.';
+DAYS[3].q = 'Qual é o nome da mãe de Jesus?';
+DAYS[3].hint = 'Começa com M e foi visitada pelo anjo Gabriel.';
 /* Selo 1: um vídeo por artista. Vazio = tela de exemplo. */
 var ACTS = [
   { id: 'danubia', name: 'Danúbia', faces: ['danubia'], video: '' },
@@ -485,7 +484,7 @@ function revealNode(kind) {
   var w = document.createElement('section'); w.className = 'reveal';
   var html = '';
   if (kind === 'familia') html = '<div class="kicker">Selo 1 · colado</div><h2>Que bom ter você em casa com a gente.</h2><div class="postal"><img src="img/artistas.jpg" alt="Os artistas de Viva Jesus reunidos numa sala decorada para o Natal" width="1100" height="700"><div class="cap"><span class="h">com carinho, de portas abertas</span><span class="m">GBA Music</span></div></div><p>Essa é a nossa família. Pode se sentar, o café já vem. E cada um aqui separou um recado só para você.</p>';
-  else if (kind === 'capa') html = '<div class="kicker">Selo 2 · colado</div><h2>Viva Jesus.</h2><img class="pic" src="img/capa.jpg" alt="Capa do single Viva Jesus" width="800" height="800"><p>Esse é o nome da música que a gente vai cantar junto neste Natal. Estamos ansiosos para celebrar em família, com a sua família, cantando Viva Jesus.</p>';
+  else if (kind === 'capa') html = '<div class="kicker">Selo 2 · colado</div><h2>Viva Jesus.</h2><img class="pic" src="img/capa.jpg" alt="Capa do single Viva Jesus" width="800" height="800"><p>Esse é o nome da música que vamos cantar juntos neste Natal. Estamos ansiosos para celebrar com você e com quem você ama, cantando Viva Jesus.</p>';
   else if (kind === 'trecho') html = '<div class="kicker">Selo 3 · colado</div><h2>Um aperitivo antes da ceia.</h2><p>Está quase lá. A gente sempre fica ansioso pela ceia, mas tem que esperar a meia-noite. Só que aqui em casa ninguém espera com fome: escute um trechinho, em primeira mão.</p>';
   else if (kind === 'obrigado') html = '<div class="kicker">Selo 4 · colado</div><h2>Obrigado por entrar.</h2><div class="note"><span class="hi">Querido(a) ' + esc(nome || 'amigo') + ',</span>É um prazer ter você na nossa casa. Você faz parte de algo especial, e essa música também é sua.\n\nNo dia 17, contamos com você para ouvir e para compartilhar com quem é especial para você.<span class="sign">Com carinho, a família GBA Music</span></div><a class="btn btn-ghost" href="' + CONFIG.premiereUrl + '" target="_blank" rel="noopener">Ativar o lembrete da estreia</a><p class="fine">Abra a estreia no YouTube e toque no sininho para ser avisado quando começar.</p>';
   var num = { familia: 1, capa: 2, trecho: 3, obrigado: 4 }[kind];
@@ -497,7 +496,7 @@ function revealNode(kind) {
 }
 function ctaNode() {
   var f = document.createDocumentFragment();
-  var a = document.createElement('a'); a.className = 'btn btn-primary'; a.target = '_blank'; a.rel = 'noopener'; a.href = CONFIG.presaveUrl; a.textContent = 'Guardar minha carta';
+  var a = document.createElement('a'); a.className = 'btn btn-primary'; a.target = '_blank'; a.rel = 'noopener'; a.href = CONFIG.presaveUrl; a.textContent = 'Salvar carta';
   var p = document.createElement('p'); p.className = 'fine'; p.textContent = 'Salve agora, para no dia 17 a música já estar na sua biblioteca.';
   f.appendChild(a); f.appendChild(p); return f;
 }
@@ -546,7 +545,7 @@ function render() {
     $('bar-right').textContent = 'Chegou';
     type([{ t: 'Querido(a) ' + nome + ',', c: 'hi' }, { t: 'os quatro selos estão colados.', c: 'ok' }, { t: 'a sua carta finalmente foi aberta.', c: 'ok' }, { t: 'Viva Jesus! Agora mande para alguém especial.', c: 'q' }]);
     var r = document.createElement('section'); r.className = 'reveal';
-    r.innerHTML = '<img class="bigstamp" src="img/selos/carimbo-entregue.webp" alt="Carimbo: Entregue, 17 de novembro" width="300" height="300"><div class="kicker">17 · XI</div><h2>A carta finalmente foi aberta.</h2><div class="note"><span class="hi">Querido(a) ' + esc(nome) + ',</span>A gente manda carta para quem é especial. E vocês são especiais para nós.\n\nPor isso, hoje a gente quer celebrar junto, com essa música, na nossa casa e na sua.<span class="sign">Viva Jesus! A família GBA Music</span></div><img class="pic" src="img/capa.jpg" alt="Capa do single Viva Jesus" width="800" height="800">';
+    r.innerHTML = '<img class="bigstamp" src="img/selos/carimbo-entregue.webp" alt="Carimbo: Entregue, 17 de novembro" width="300" height="300"><div class="kicker">17 · XI</div><h2>A carta finalmente foi aberta.</h2><div class="note"><span class="hi">Querido(a) ' + esc(nome) + ',</span>Cartas são feitas para quem é especial, e você é especial para nós.\n\nPor isso, hoje queremos celebrar juntos, com essa música, na nossa casa e na sua.<span class="sign">Viva Jesus! A família GBA Music</span></div><img class="pic" src="img/capa.jpg" alt="Capa do single Viva Jesus" width="800" height="800">';
     var a = document.createElement('a'); a.className = 'btn btn-primary'; a.href = CONFIG.listenUrl; a.target = '_blank'; a.rel = 'noopener'; a.textContent = 'Ouvir agora';
     r.appendChild(a);
     var sh = document.createElement('button'); sh.type = 'button'; sh.className = 'btn btn-ghost'; sh.textContent = 'Mandar para alguém';
