@@ -234,6 +234,10 @@ body.locked { overflow: hidden; }
 .btn-primary:hover { background: var(--wine-hover); }
 .btn-ghost { background: transparent; color: var(--wine); border: 2px solid var(--wine); }
 .btn-ghost:hover { background: rgba(110, 30, 10, .07); }
+.prize { display: flex; flex-direction: column; gap: 6px; padding: 18px 20px; border: 2px dashed var(--wine); border-radius: 14px; background: rgba(255, 214, 150, .45); }
+.prize strong { font-family: var(--display); font-weight: 400; font-size: 28px; line-height: 1.1; color: var(--ink); }
+.prize p { margin: 0; font-size: 16px; }
+.prize a { color: var(--wine); text-decoration: underline; text-underline-offset: 3px; min-height: 44px; display: inline-flex; align-items: center; }
 .fine { font-size: 14px; line-height: 1.6; color: var(--ink-soft); margin: 0; }
 .past { border-top: 1px solid var(--line); }
 .past summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-family: var(--type); font-size: 13px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--wine); }
@@ -374,6 +378,7 @@ var CONFIG = {
   listenUrl: 'https://SEU-SMARTLINK',
   teaserVideo: 'videos/trechinho.mp4',                 // selo 3: trechinho em primeira mão (arquivo na pasta videos/)
   premiereUrl: 'https://SEU-LINK-DA-ESTREIA-NO-YOUTUBE', // selo 4: estreia agendada (ativar o sininho)
+  rulesUrl: '',                                         // selo 4: link do regulamento do sorteio (vazio = não mostra)
   siteUrl: 'https://gbamusic.github.io/portas-abertas/',
   launchDate: '2026-11-17'
 };
@@ -562,7 +567,7 @@ function revealNode(kind) {
   if (kind === 'familia') html = '<div class="kicker">Selo 1 · colado</div><h2>Que bom ter você em casa com a gente.</h2><div class="postal"><img src="img/artistas.jpg" alt="Os artistas de Viva Jesus reunidos numa sala decorada para o Natal" width="1100" height="700"><div class="cap"><span class="h">com carinho, de portas abertas</span><span class="m">GBA Music</span></div></div><p>Essa é a nossa família. Pode se sentar, o café já vem. E cada um aqui separou um recado só para você.</p>';
   else if (kind === 'capa') html = '<div class="kicker">Selo 2 · colado</div><h2>Viva Jesus.</h2><img class="pic" src="img/capa.jpg" alt="Capa do single Viva Jesus" width="800" height="800"><p>Esse é o nome da música que vamos cantar juntos neste Natal. Estamos ansiosos para celebrar com você e com quem você ama, cantando Viva Jesus.</p>';
   else if (kind === 'trecho') html = '<div class="kicker">Selo 3 · colado</div><h2>Um aperitivo antes da ceia.</h2><p>Está quase lá. A gente sempre fica ansioso pela ceia, mas tem que esperar a meia-noite. Só que aqui em casa ninguém espera com fome: escute um trechinho, em primeira mão.</p>';
-  else if (kind === 'obrigado') html = '<div class="kicker">Selo 4 · colado</div><h2>Obrigado por entrar.</h2><div class="note"><span class="hi">Querido(a) ' + esc(nome || 'amigo') + ',</span>É um prazer ter você na nossa casa. Você faz parte de algo especial, e essa música também é sua.\n\nNo dia 17, contamos com você para ouvir e para compartilhar com quem é especial para você.<span class="sign">Com carinho, a família GBA Music</span></div><a class="btn btn-ghost" data-ev="lembrete_estreia" href="' + CONFIG.premiereUrl + '" target="_blank" rel="noopener">Ativar o lembrete da estreia</a><p class="fine">Abra a estreia no YouTube e toque no sininho para ser avisado quando começar.</p>';
+  else if (kind === 'obrigado') html = '<div class="kicker">Selo 4 · colado</div><h2>Obrigado por entrar.</h2><div class="note"><span class="hi">Querido(a) ' + esc(nome || 'amigo') + ',</span>É um prazer ter você na nossa casa. Você faz parte de algo especial, e essa música também é sua.\n\nNo dia 17, contamos com você para ouvir e para compartilhar com quem é especial para você.\n\nE para agradecer, vamos sortear 10 cestas de Natal entre quem salvar a carta e fizer o pré-save.<span class="sign">Com carinho, a família GBA Music</span></div><div class="prize"><span class="kicker">Sorteio</span><strong>10 cestas de Natal</strong><p>Para participar, toque em <b>Salvar carta</b>, logo abaixo, e faça o pré-save da música.</p>' + (CONFIG.rulesUrl ? '<a class="fine" data-ev="regulamento" href="' + CONFIG.rulesUrl + '" target="_blank" rel="noopener">Ver regulamento</a>' : '') + '</div><a class="btn btn-ghost" data-ev="lembrete_estreia" href="' + CONFIG.premiereUrl + '" target="_blank" rel="noopener">Ativar o lembrete da estreia</a><p class="fine">Abra a estreia no YouTube e toque no sininho para ser avisado quando começar.</p>';
   var num = { familia: 1, capa: 2, trecho: 3, obrigado: 4 }[kind];
   if (num) html = '<img class="bigstamp" src="img/selos/selo-' + num + '.webp" alt="Selo ' + num + ' de 4" width="411" height="520">' + html;
   w.innerHTML = html;
