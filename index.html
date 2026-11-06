@@ -15,17 +15,16 @@
 <meta name="description" content="A nossa casa está de portas abertas para você e sua família. Tem uma carta esperando por você.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://gbamusic.github.io/portas-abertas/">
-<meta property="og:title" content="Portas Abertas · Viva Jesus">
+<meta property="og:title" content="Portas Abertas · GBA Music">
 <meta property="og:description" content="A nossa casa está de portas abertas para você e sua família. Tem uma carta esperando por você.">
-<meta property="og:image" content="https://gbamusic.github.io/portas-abertas/img/capa.jpg">
+<meta property="og:image" content="https://gbamusic.github.io/portas-abertas/img/porta.jpg">
 <link rel="preload" href="fonts/abril-fatface-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="img/capa.jpg" as="image">
 <style>*{box-sizing:border-box}body{margin:0}</style>
 <title>Portas Abertas</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
 /* Layout: uma coluna de celular. Entrada = a capa (porta em arco) e um zoom para dentro da porta; depois a casa (nome + cafezinho); depois a carta com 4 selos.
-   IDENTIDADE "Viva Jesus" (capa oficial): creme e pêssego quentes, marrom do VIVA, vinho-tijolo do JESUS, âmbar da luz, verde da guirlanda.
+   IDENTIDADE da campanha (capa oficial): creme e pêssego quentes, marrom do VIVA, vinho-tijolo do JESUS, âmbar da luz, verde da guirlanda.
    Visual único (claro e quente), por escolha da identidade. Fontes hospedadas na pasta fonts/. */
 @font-face { font-family: 'Abril Fatface'; src: url(fonts/abril-fatface-latin-400-normal.woff2) format('woff2'); font-display: swap; }
 @font-face { font-family: 'Merriweather'; font-weight: 400; src: url(fonts/merriweather-latin-400-normal.woff2) format('woff2'); font-display: swap; }
@@ -145,8 +144,6 @@ body.locked { overflow: hidden; }
 @keyframes steam { 0% { opacity: 0; transform: translateY(8px); } 40% { opacity: .8; } 100% { opacity: 0; transform: translateY(-14px); } }
 
 /* ===== Topo da página ===== */
-.brand { position: relative; margin: 0 calc(-1 * max(16px, env(safe-area-inset-left, 0px))); }
-.brand img { display: block; width: 100%; height: auto; -webkit-mask-image: radial-gradient(75% 70% at 50% 50%, #000 55%, transparent 100%); mask-image: radial-gradient(75% 70% at 50% 50%, #000 55%, transparent 100%); }
 .bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-family: var(--type); font-size: 13px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--wine); }
 .bar .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--amber); margin-right: 8px; vertical-align: 1px; box-shadow: 0 0 0 4px rgba(200, 100, 28, .2); }
 
@@ -337,8 +334,6 @@ body.locked { overflow: hidden; }
     <span id="testdays" style="display:flex;flex-wrap:wrap;gap:6px"></span>
   </div>
 
-  <div class="brand"><img src="img/lettering.jpg" alt="Viva Jesus" width="880" height="510"></div>
-
   <div class="bar">
     <div><span class="dot" aria-hidden="true"></span>Sua carta</div>
     <div id="bar-right">Selo 1 de 4</div>
@@ -347,7 +342,7 @@ body.locked { overflow: hidden; }
   <div class="seals" id="seals" aria-label="Selos da sua carta"></div>
 
   <section class="term" id="term" aria-label="Carta do dia">
-    <div class="head"><span id="letter-to">Carta para você</span><span id="letter-date">Viva Jesus</span></div>
+    <div class="head"><span id="letter-to">Carta para você</span><span id="letter-date">Em breve</span></div>
     <div class="lines" id="lines" aria-live="polite"></div>
     <form class="answer" id="answer" hidden>
       <label for="ans">Sua resposta</label>
@@ -527,7 +522,7 @@ function buildPlayer(opts) {
 }
 function buildChooser() {
   var box = document.createElement('div'); box.className = 'chooser';
-  box.innerHTML = '<p class="ask">Escolha alguém da nossa família para ver uma mensagem especial.</p><p class="sub">Depois da primeira mensagem, os outros também ficam disponíveis.</p><div class="acts"></div><div class="stagearea"></div>';
+  box.innerHTML = '<p class="ask">Escolha alguém da nossa família para ver uma mensagem especial.</p><div class="acts"></div><div class="stagearea"></div>';
   var acts = box.querySelector('.acts'), area = box.querySelector('.stagearea');
   function unlocked() { return store('vj-outros') === '1'; }
   function chosen() { return store('vj-escolha'); }
@@ -554,12 +549,7 @@ function buildChooser() {
     if (!reduce) setTimeout(function () { p.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
   }
   function finish() {
-    var first = !unlocked(); store('vj-outros', '1'); draw();
-    var old = area.querySelector('.after'); if (old) old.remove();
-    var af = document.createElement('div'); af.className = 'after';
-    af.innerHTML = '<p class="fine"></p>';
-    af.querySelector('.fine').textContent = first ? 'Os outros também deixaram uma mensagem para você. Toque em outro rosto acima.' : 'Toque em outro rosto acima para ouvir mais alguém.';
-    area.appendChild(af);
+    store('vj-outros', '1'); draw();
   }
   draw();
   return box;
@@ -621,7 +611,7 @@ function render() {
   $('term').classList.remove('shake');
   $('rename').hidden = !nome;
   $('letter-to').textContent = 'Carta para ' + (nome || 'você');
-  $('letter-date').textContent = idx >= 0 && !launched() ? DAYS[idx].label : (launched() ? '17/11' : 'Viva Jesus');
+  $('letter-date').textContent = idx >= 0 && !launched() ? DAYS[idx].label : (launched() ? '17/11' : 'Em breve');
   renderSeals(idx);
 
   if (!nome) { homeReady = false; showHome(); return; }
