@@ -148,6 +148,17 @@ body.locked { overflow: hidden; }
 .bar .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--amber); margin-right: 8px; vertical-align: 1px; box-shadow: 0 0 0 4px rgba(200, 100, 28, .2); }
 
 /* Selos */
+.track { list-style: none; margin: 2px 0 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.track li { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; font-family: var(--type); font-size: 11px; font-weight: 700; line-height: 1.25; color: var(--ink-soft); padding: 0 2px; }
+.track li:not(:first-child)::before { content: ""; position: absolute; top: 8px; right: 50%; width: 100%; height: 2px; background: rgba(110, 30, 10, .18); }
+.track li.done::before { background: var(--wine); }
+.track .pt { position: relative; z-index: 1; width: 18px; height: 18px; box-sizing: border-box; border-radius: 50%; border: 2px solid rgba(110, 30, 10, .35); background: var(--paper); display: flex; align-items: center; justify-content: center; color: var(--paper); }
+.track .done .pt, .track li.done .pt { background: var(--wine); border-color: var(--wine); }
+.track li.now .pt { box-shadow: 0 0 0 4px rgba(200, 100, 28, .28); animation: pulse 2s ease-in-out infinite; }
+.track li.done, .track li.now { color: var(--ink); }
+.track .dt { display: none; }
+@keyframes pulse { 50% { box-shadow: 0 0 0 7px rgba(200, 100, 28, .12); } }
+.trackmsg { margin: -8px 0 0; text-align: center; font-size: 13px; line-height: 1.5; color: var(--ink-soft); }
 .seals { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
 .sealbox { display: flex; flex-direction: column; align-items: center; gap: 6px; font-family: var(--type); font-size: 13px; font-weight: 700; letter-spacing: .08em; color: var(--ink-soft); }
 .sealbox .stamp { display: block; width: 100%; max-width: 70px; aspect-ratio: 4 / 5; padding: 4px; box-sizing: border-box; background: radial-gradient(circle at 4px 4px, transparent 2.4px, var(--paper) 2.9px) -4px -4px / 8px 8px; filter: drop-shadow(0 3px 5px rgba(80, 30, 5, .15)); }
@@ -252,7 +263,7 @@ body.locked { overflow: hidden; }
 .testbar button[aria-pressed="true"] { background: var(--wine); color: var(--paper); border-color: var(--wine); }
 :focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) {
-  .caret, .sealbox.today .stamp, .sealbox .stampimg, .reveal, .term.shake, .steam path, .home { animation: none; }
+  .track li.now .pt, .caret, .sealbox.today .stamp, .sealbox .stampimg, .reveal, .term.shake, .steam path, .home { animation: none; }
   .steam path { opacity: .6; }
   .leaf, .wreath, .intro.through { transition: none; }
   .garland .lights path { animation: none; }
@@ -339,9 +350,12 @@ body.locked { overflow: hidden; }
   </div>
 
   <div class="bar">
-    <div><span class="dot" aria-hidden="true"></span>Sua carta</div>
-    <div id="bar-right">Selo 1 de 4</div>
+    <div><span class="dot" aria-hidden="true"></span>Rastreio da carta</div>
+    <div id="bar-right">Aguardando</div>
   </div>
+
+  <ol class="track" id="track" aria-label="Rastreio da sua carta"></ol>
+  <p class="trackmsg" id="trackmsg"></p>
 
   <div class="seals" id="seals" aria-label="Selos da sua carta"></div>
 
@@ -421,6 +435,8 @@ function cleanName(s) { return (s || '').replace(/[^\p{L}\p{M}' -]/gu, '').trim(
 function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 var nome = cleanName(params.get('nome'));
 if (nome) store('vj-nome', nome); else nome = cleanName(store('vj-nome'));
+/* tira o nome do endereço, para que um link copiado não leve o nome de quem copiou */
+if (params.has('nome')) { try { var u = new URL(location.href); u.searchParams.delete('nome'); history.replaceState(null, '', u.pathname + (u.search ? u.search : '') + u.hash); } catch (e) {} }
 var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function todayIndex() { var t = today(), n = -1; DAYS.forEach(function (d, i) { if (d.d <= t) n = i; }); return n; }
@@ -591,7 +607,33 @@ function nextNode(i) {
 
 /* ===== Tela ===== */
 var wrong = 0;
+var TRACK = [
+  { t: 'Postada', m: 'Sua carta foi postada. Cole o selo de amanhã para ela seguir viagem.' },
+  { t: 'Em trânsito', m: 'Sua carta está a caminho.' },
+  { t: 'Na cidade', m: 'Sua carta chegou na sua cidade. Falta pouco!' },
+  { t: 'Saiu p/ entrega', m: 'Sua carta saiu para entrega. À meia-noite ela chega na sua casa.' },
+  { t: 'Entregue', m: 'Sua carta foi entregue. Viva Jesus!' }
+];
+function renderTrack(idx) {
+  var k = launched() ? 5 : 0;
+  if (!launched()) DAYS.forEach(function (d, i) { if (i < idx || (i === idx && solved(i))) k = i + 1; });
+  var box = $('track'); box.textContent = '';
+  var dates = ['13/11', '14/11', '15/11', '16/11', '17/11'];
+  var check = '<svg width="10" height="10" viewBox="0 0 14 14" aria-hidden="true"><path d="M2.5 7.5 L5.8 10.5 L11.5 3.8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>';
+  TRACK.forEach(function (st, i) {
+    var li = document.createElement('li');
+    var done = i < k;
+    li.className = (done ? 'done' : '') + (i === k - 1 ? ' now' : '');
+    li.innerHTML = '<span class="pt">' + (done ? check : '') + '</span><span></span><span class="dt">' + dates[i] + '</span>';
+    li.children[1].textContent = st.t;
+    li.setAttribute('aria-label', st.t + ', ' + dates[i] + ', ' + (done ? 'concluído' : 'pendente'));
+    box.appendChild(li);
+  });
+  $('bar-right').textContent = k ? TRACK[k - 1].t : 'Aguardando';
+  $('trackmsg').textContent = k ? TRACK[k - 1].m : (todayIndex() >= 0 ? 'Cole o primeiro selo para postar a sua carta.' : 'Sua carta será postada em 13/11.');
+}
 function renderSeals(idx) {
+  renderTrack(idx);
   var box = $('seals'); box.textContent = '';
   DAYS.forEach(function (d, i) {
     var open = launched() || i < idx || (i === idx && solved(i));
@@ -623,7 +665,6 @@ function render() {
   renderPast(idx);
 
   if (launched()) {
-    $('bar-right').textContent = 'Chegou';
     type([{ t: 'Querido(a) ' + nome + ',', c: 'hi' }, { t: 'os quatro selos estão colados.', c: 'ok' }, { t: 'a sua carta finalmente foi aberta.', c: 'ok' }, { t: 'Viva Jesus! Agora mande para alguém especial.', c: 'q' }]);
     var r = document.createElement('section'); r.className = 'reveal';
     r.innerHTML = '<img class="bigstamp" src="img/selos/carimbo-entregue.webp" alt="Carimbo: Entregue, 17 de novembro" width="300" height="300"><div class="kicker">17 · XI</div><h2>A carta finalmente foi aberta.</h2><div class="note"><span class="hi">Querido(a) ' + esc(nome) + ',</span>Cartas são feitas para quem é especial, e você é especial para nós.\n\nPor isso, hoje queremos celebrar juntos, com essa música, na nossa casa e na sua.<span class="sign">Viva Jesus! A família GBA Music</span></div><img class="pic" src="img/capa.jpg" alt="Capa do single Viva Jesus" width="800" height="800">';
@@ -647,11 +688,9 @@ function render() {
     return;
   }
   if (idx < 0) {
-    $('bar-right').textContent = 'Abre 13/11';
     type([{ t: 'Querido(a) ' + nome + ',', c: 'hi' }, { t: 'esta carta só pode ser lida com 4 selos.', c: 'dim' }, { t: 'o primeiro selo chega em 13/11, à meia-noite.', c: 'p' }]);
     return;
   }
-  $('bar-right').textContent = 'Selo ' + (idx + 1) + ' de 4';
   if (solved(idx)) { showSolved(idx, false); return; }
   var d = DAYS[idx];
   var intro = idx === 0
