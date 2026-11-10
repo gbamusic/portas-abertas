@@ -249,6 +249,11 @@ body.locked { overflow: hidden; }
 .prize strong { font-family: var(--display); font-weight: 400; font-size: 28px; line-height: 1.1; color: var(--ink); }
 .prize p { margin: 0; font-size: 16px; }
 .prize a { color: var(--wine); text-decoration: underline; text-underline-offset: 3px; min-height: 44px; display: inline-flex; align-items: center; }
+.ctas { display: flex; flex-direction: column; gap: 28px; margin-top: 4px; }
+.cta { display: flex; flex-direction: column; gap: 10px; text-align: center; }
+.cta .num { font-family: var(--type); font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--wine); }
+.cta .btn { min-height: 48px; padding: 12px 20px; font-size: 14px; }
+.cta .btn svg { width: 20px; height: 20px; flex: none; margin-right: 8px; }
 .fine { font-size: 14px; line-height: 1.6; color: var(--ink-soft); margin: 0; }
 .past { border-top: 1px solid var(--line); }
 .past summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-family: var(--type); font-size: 13px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--wine); }
@@ -578,13 +583,14 @@ function buildChooser() {
 }
 
 /* ===== Revelações ===== */
-function revealNode(kind) {
+function rules() { return CONFIG.rulesUrl ? '<a class="fine" data-ev="regulamento" href="' + CONFIG.rulesUrl + '" target="_blank" rel="noopener">Ver regulamento</a>' : ''; }
+function revealNode(kind, past) {
   var w = document.createElement('section'); w.className = 'reveal';
   var html = '';
   if (kind === 'familia') html = '<div class="kicker">Selo 1 · colado</div><h2>Que bom ter você em casa com a gente.</h2><div class="postal"><img src="img/artistas.jpg" alt="Os artistas de Viva Jesus reunidos numa sala decorada para o Natal" width="1100" height="700"><div class="cap"><span class="h">com carinho, Família GBA Music</span><span class="m">GBA Music</span></div></div><p>Essa é a nossa família. Pode se sentar, o café já vem. E cada um aqui separou um recado só para você.</p>';
-  else if (kind === 'capa') html = '<div class="kicker">Selo 2 · colado</div><h2>Viva Jesus.</h2><img class="pic" src="img/capa.jpg" alt="Capa do single Viva Jesus" width="800" height="800"><p>Esse é o nome da música que vamos cantar juntos neste Natal. Estamos ansiosos para celebrar com você e com quem você ama, cantando Viva Jesus.</p>';
+  else if (kind === 'capa') html = '<div class="kicker">Selo 2 · colado</div><h2>Viva Jesus.</h2><img class="pic" src="img/capa.jpg" alt="Capa do single Viva Jesus" width="800" height="800"><p>Esse é o nome da música que vamos cantar juntos neste Natal. Estamos ansiosos para celebrar com você e com quem você ama, cantando Viva Jesus.</p>' + (past ? '' : '<div class="prize"><span class="kicker">Amigo secreto da GBA</span><strong>Natal em família tem amigo secreto.</strong><p>Vamos sortear <b>10 pessoas</b> entre quem salvar a carta. Cada uma recebe em casa uma caixa igual à que nossos artistas ganharam. Para participar, toque em <b>Salvar carta</b>, logo abaixo.</p>' + rules() + '</div>');
   else if (kind === 'trecho') html = '<div class="kicker">Selo 3 · colado</div><h2>Um aperitivo antes da ceia.</h2><p>Está quase lá. A gente sempre fica ansioso pela ceia, mas tem que esperar a meia-noite. Só que aqui em casa ninguém espera com fome: escute um trechinho, em primeira mão.</p>';
-  else if (kind === 'obrigado') html = '<div class="kicker">Selo 4 · colado</div><h2>Obrigado por entrar.</h2><div class="note"><span class="hi">Querido(a) ' + esc(nome || 'amigo') + ',</span>É um prazer ter você na nossa casa. Você faz parte de algo especial, e essa música também é sua.\n\nNo dia 17, contamos com você para ouvir e para compartilhar com quem é especial para você.\n\nE para agradecer, vamos sortear 10 cestas de Natal entre quem salvar a carta e fizer o pré-save.<span class="sign">Com carinho, a família GBA Music</span></div><div class="prize"><span class="kicker">Sorteio</span><strong>10 cestas de Natal</strong><p>Para participar, toque em <b>Salvar carta</b>, logo abaixo, e faça o pré-save da música.</p>' + (CONFIG.rulesUrl ? '<a class="fine" data-ev="regulamento" href="' + CONFIG.rulesUrl + '" target="_blank" rel="noopener">Ver regulamento</a>' : '') + '</div><a class="btn btn-ghost" data-ev="lembrete_estreia" href="' + CONFIG.premiereUrl + '" target="_blank" rel="noopener">Ativar o lembrete da estreia</a><p class="fine">Abra a estreia no YouTube e toque no sininho para ser avisado quando começar.</p>';
+  else if (kind === 'obrigado') html = '<div class="kicker">Selo 4 · colado</div><h2>Obrigado por entrar.</h2><div class="note"><span class="hi">Querido(a) ' + esc(nome || 'amigo') + ',</span>É um prazer ter você na nossa casa. Você faz parte de algo especial, e essa música também é sua.\n\nNo dia 17, contamos com você para ouvir e para compartilhar com quem é especial para você.<span class="sign">Com carinho, a família GBA Music</span></div>' + (past ? '' : '<div class="prize"><span class="kicker">Lembrete · amigo secreto</span><strong>Hoje é o último dia.</strong><p>O amigo secreto da GBA fecha hoje, à meia-noite. Se você ainda não salvou a carta, salve agora para concorrer a uma das 10 caixas.</p>' + rules() + '</div>');
   var num = { familia: 1, capa: 2, trecho: 3, obrigado: 4 }[kind];
   if (num) html = '<img class="bigstamp" src="img/selos/selo-' + num + '.webp" alt="Selo ' + num + ' de 4" width="411" height="520">' + html;
   w.innerHTML = html;
@@ -592,11 +598,18 @@ function revealNode(kind) {
   if (kind === 'trecho') w.appendChild(buildPlayer({ video: CONFIG.teaserVideo, ev: 'trechinho_play', fit: 'contain', label: 'Trechinho de Viva Jesus em primeira mão', bg: '<img src="img/capa.jpg" alt="">', av: '<img src="img/capa.jpg" alt="">', placeholder: 'Aqui entra o trechinho de Viva Jesus.' }));
   return w;
 }
-function ctaNode() {
-  var f = document.createDocumentFragment();
-  var a = document.createElement('a'); a.className = 'btn btn-primary'; a.target = '_blank'; a.rel = 'noopener'; a.href = CONFIG.presaveUrl; a.setAttribute('data-ev', 'salvar_carta'); a.textContent = 'Salvar carta';
-  var p = document.createElement('p'); p.className = 'fine'; p.textContent = 'Salve agora, para no dia 17 a música já estar na sua biblioteca.';
-  f.appendChild(a); f.appendChild(p); return f;
+var YT_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M23 7.2a3 3 0 0 0-2.1-2.1C19 4.6 12 4.6 12 4.6s-7 0-8.9.5A3 3 0 0 0 1 7.2 31 31 0 0 0 .5 12a31 31 0 0 0 .5 4.8 3 3 0 0 0 2.1 2.1c1.9.5 8.9.5 8.9.5s7 0 8.9-.5a3 3 0 0 0 2.1-2.1 31 31 0 0 0 .5-4.8 31 31 0 0 0-.5-4.8zM9.7 15.1V8.9l5.8 3.1-5.8 3.1z"/></svg>';
+function ctaNode(idx) {
+  var w = document.createElement('div'); w.className = 'ctas';
+  var two = idx >= 1; // dias 14 a 16
+  var save = '<div class="cta">' + (two ? '<span class="num">Pré-save no app de música</span>' : '') +
+    '<a class="btn btn-primary" data-ev="salvar_carta" href="' + CONFIG.presaveUrl + '" target="_blank" rel="noopener">Salvar carta</a>' +
+    '<p class="fine">' + (two ? 'Faça o pré-save de Viva Jesus. Assim ela já aparece na sua biblioteca no dia 17. E você também entra no amigo secreto e concorre a uma caixa.' : 'Salve agora, para no dia 17 a música já estar na sua biblioteca.') + '</p></div>';
+  var yt = two ? '<div class="cta"><span class="num">Estreia no YouTube</span>' +
+    '<a class="btn btn-ghost" data-ev="lembrete_estreia" href="' + CONFIG.premiereUrl + '" target="_blank" rel="noopener">' + YT_ICON + 'Ativar lembrete</a>' +
+    '<p class="fine">Ative o lembrete da estreia do clipe no YouTube.</p></div>' : '';
+  w.innerHTML = save + yt;
+  return w;
 }
 function nextNode(i) {
   var n = document.createElement('div'); n.className = 'next';
@@ -648,7 +661,7 @@ function renderSeals(idx) {
 function renderPast(idx) {
   var upto = launched() ? DAYS.length : idx;
   var inner = $('past-inner'); inner.textContent = '';
-  for (var i = 0; i < upto; i++) inner.appendChild(revealNode(DAYS[i].reveal));
+  for (var i = 0; i < upto; i++) inner.appendChild(revealNode(DAYS[i].reveal, true));
   $('past').hidden = upto <= 0;
 }
 function render() {
@@ -708,18 +721,26 @@ function showSolved(idx, fresh) {
   renderSeals(idx);
   var slot = $('reveal-slot'); slot.textContent = '';
   slot.appendChild(revealNode(DAYS[idx].reveal));
-  slot.appendChild(ctaNode());
+  slot.appendChild(ctaNode(idx));
   if (fresh && !reduce) setTimeout(function () { slot.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 900);
 }
 
-$('nameform').addEventListener('submit', function (e) {
+/* Formularios: alem do submit, responde ao clique e ao Enter (alguns navegadores e visualizadores bloqueiam o envio de formulario) */
+function bindForm(form, fn) {
+  var busy = false;
+  function run(e) { if (e) e.preventDefault(); if (busy) return; busy = true; try { fn(e); } finally { setTimeout(function () { busy = false; }, 0); } }
+  form.addEventListener('submit', run);
+  var btn = form.querySelector('button'); if (btn) btn.addEventListener('click', run);
+  var inp = form.querySelector('input'); if (inp) inp.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.isComposing) run(e); });
+}
+bindForm($('nameform'), function (e) {
   e.preventDefault();
   var v = cleanName($('nm-in').value);
   if (!v) { $('nm-in').focus(); return; }
   nome = v; store('vj-nome', v); track('nome_preenchido'); showHome();
 });
 $('rename').addEventListener('click', function () { nome = ''; store('vj-nome', ''); try { localStorage.removeItem('vj-visitou'); } catch (e) {} homeReady = false; showHome(); });
-$('answer').addEventListener('submit', function (e) {
+bindForm($('answer'), function (e) {
   e.preventDefault();
   var idx = todayIndex(); if (idx < 0) return;
   var v = $('ans').value;
