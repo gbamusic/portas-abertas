@@ -433,7 +433,8 @@ function key(w) { try { return btoa(w.split('').reverse().join('')); } catch (e)
 function matches(input, k) { var words = norm(input).split(' '); var all = norm(input).replace(/ /g, ''); return words.some(function (w) { return key(w) === k; }) || key(all) === k; }
 function cleanName(s) { return (s || '').replace(/[^\p{L}\p{M}' -]/gu, '').trim().split(' ')[0].slice(0, 20); }
 function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-var nome = cleanName(params.get('nome'));
+var rawNome = params.get('nome') || '';
+var nome = /[{}]|first_?name/i.test(rawNome) ? '' : cleanName(rawNome);  /* ignora {{first_name}} que não foi trocado pelo ManyChat */
 if (nome) store('vj-nome', nome); else nome = cleanName(store('vj-nome'));
 /* tira o nome do endereço, para que um link copiado não leve o nome de quem copiou */
 if (params.has('nome')) { try { var u = new URL(location.href); u.searchParams.delete('nome'); history.replaceState(null, '', u.pathname + (u.search ? u.search : '') + u.hash); } catch (e) {} }
