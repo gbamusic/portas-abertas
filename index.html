@@ -396,6 +396,7 @@ var CONFIG = {
   presaveUrl: 'https://onerpm.link/vivajesus',
   listenUrl: 'https://www.youtube.com/watch?v=W5TyHQbB2xg',
   teaserVideo: 'videos/trechinho.mp4',                 // selo 3: trechinho em primeira mão (arquivo na pasta videos/)
+  playbackUrl: 'audio/viva-jesus-playback.mp3', // dia 17: botao Baixe aqui o playback (arquivo na pasta audio/ ou link do Drive)
   premiereUrl: 'https://www.youtube.com/watch?v=W5TyHQbB2xg', // selo 4: estreia agendada (ativar o sininho)
   rulesUrl: '',                                         // selo 4: link do regulamento do sorteio (vazio = não mostra)
   siteUrl: 'https://gbamusic.github.io/portas-abertas/',
@@ -684,6 +685,11 @@ function render() {
     r.innerHTML = '<img class="bigstamp" src="img/selos/carimbo-entregue.webp" alt="Carimbo: Entregue, 17 de novembro" width="300" height="300"><div class="kicker">17 · XI</div><h2>A carta finalmente foi aberta.</h2><div class="note"><span class="hi">Querido(a) ' + esc(nome) + ',</span>Cartas são feitas para quem é especial, e você é especial para nós.\n\nPor isso, hoje queremos celebrar juntos, com essa música, na nossa casa e na sua.<span class="sign">Viva Jesus! A família GBA Music</span></div><img class="pic" src="img/capa.jpg" alt="Capa do single Viva Jesus" width="800" height="800">';
     var a = document.createElement('a'); a.className = 'btn btn-primary'; a.href = CONFIG.listenUrl; a.target = '_blank'; a.rel = 'noopener'; a.setAttribute('data-ev', 'ouvir_agora'); a.textContent = 'Ouvir agora';
     r.appendChild(a);
+    if (CONFIG.playbackUrl) {
+      var pb = document.createElement('div'); pb.className = 'cta';
+      pb.innerHTML = '<span class="num">Para cantar junto</span><a class="btn btn-ghost" data-ev="baixar_playback" href="' + CONFIG.playbackUrl + '" download="Viva Jesus (playback) - GBA Music.mp3" target="_blank" rel="noopener">Baixe aqui o playback</a><p class="fine">Cante Viva Jesus em casa, no seu grupo ou na igreja. Grave e poste marcando a GBA Music.</p><p class="fine">Se estiver no Instagram, toque nos três pontinhos e abra no navegador para baixar.</p>';
+      r.appendChild(pb);
+    }
     var sh = document.createElement('button'); sh.type = 'button'; sh.className = 'btn btn-ghost'; sh.textContent = 'Mandar para alguém';
     var msg = document.createElement('p'); msg.className = 'fine'; msg.setAttribute('aria-live', 'polite');
     var cl = document.createElement('div'); cl.className = 'copyline'; cl.hidden = true; cl.innerHTML = '<label class="fine" for="share-url" style="position:absolute;left:-9999px">Link para enviar</label><input id="share-url" type="text" readonly>';
